@@ -1,4 +1,7 @@
 import json
+import sys
+import termios
+import tty
 from contextlib import contextmanager
 from typing import Generator
 
@@ -59,6 +62,33 @@ def handle_errors() -> Generator[None, None, None]:
         raise SystemExit(1)
 
 
+def _prompt_password(prompt: str = "Senha") -> str:
+    """Lê a senha do terminal exibindo '*' para cada caractere digitado."""
+    click.echo(f"{prompt}: ", nl=False)
+    password: list[str] = []
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        while True:
+            ch = sys.stdin.read(1)
+            if ch in ("\r", "\n"):
+                break
+            if ch == "\x03":
+                raise KeyboardInterrupt
+            if ch in ("\x7f", "\x08"):  # Backspace
+                if password:
+                    password.pop()
+                    click.echo("\b \b", nl=False)
+            else:
+                password.append(ch)
+                click.echo("*", nl=False)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    click.echo()
+    return "".join(password)
+
+
 def _print_json(data: object) -> None:
     click.echo(json.dumps(data, indent=2, ensure_ascii=False))
 
@@ -73,7 +103,7 @@ def login() -> None:
     """Realiza login no SUAP."""
     url = click.prompt("URL da sua instancia SUAP (ex: https://suap.ifpi.edu.br)")
     username = click.prompt("Matricula")
-    password = click.prompt("Senha", hide_input=True)
+    password = _prompt_password()
 
     base_url = normalize_url(url)
 
