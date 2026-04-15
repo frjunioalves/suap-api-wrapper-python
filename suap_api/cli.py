@@ -6,10 +6,9 @@ from contextlib import contextmanager
 from typing import Generator
 
 import click
-import keyring
 
-from .client import KEYRING_ACCESS, KEYRING_REFRESH, SuapClient
-from .config import clear_config, load_config, normalize_url, save_config
+from .client import SuapClient
+from .config import clear_config, clear_tokens, load_config, normalize_url, save_config, save_tokens
 from .exceptions import (
     SuapAuthError,
     SuapConnectionError,
@@ -110,8 +109,7 @@ def login() -> None:
     with handle_errors():
         client = SuapClient(base_url=base_url)
         access, refresh = client.token.authenticate(username, password)
-        keyring.set_password(KEYRING_ACCESS, username, access)
-        keyring.set_password(KEYRING_REFRESH, username, refresh)
+        save_tokens(username, access, refresh)
         save_config(base_url, username)
         click.echo("Login realizado com sucesso.")
 
@@ -121,12 +119,7 @@ def logout() -> None:
     """Encerra a sessao atual."""
     try:
         config = load_config()
-        username = config["username"]
-        for service in (KEYRING_ACCESS, KEYRING_REFRESH):
-            try:
-                keyring.delete_password(service, username)
-            except Exception:
-                pass
+        clear_tokens(config["username"])
     except Exception:
         pass
     clear_config()

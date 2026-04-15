@@ -1,9 +1,8 @@
 from typing import Any, Optional
 
-import keyring
 import requests
 
-from .config import load_config
+from .config import load_config, load_tokens, save_tokens
 from .exceptions import (
     SuapConnectionError,
     SuapForbiddenError,
@@ -15,9 +14,6 @@ from .exceptions import (
     SuapValidationError,
 )
 from .resources import CommonResource, EduResource, TokenResource
-
-KEYRING_ACCESS = "suap_api_access"
-KEYRING_REFRESH = "suap_api_refresh"
 
 
 def _parse_error(response: requests.Response) -> str:
@@ -83,13 +79,19 @@ class SuapClient:
 
             with SuapClient() as client:
                 dados = client.comum.get_my_data()
-                periodos = client.edu.get_periods()
-                diarios = client.edu.get_diaries("2024.1")
 
-        Uso manual sem configuração salva::
+        Uso com credenciais diretas (sem CLI)::
 
-            with SuapClient(base_url="https://suap.ifpi.edu.br") as client:
-                client.token.authenticate("20221234", "senha")
+            with SuapClient(
+                base_url="https://suap.ifpi.edu.br",
+                username="20221234",
+                password="senha",
+            ) as client:
+                dados = client.comum.get_my_data()
+
+        Uso com token JWT já obtido::
+
+            with SuapClient(base_url="https://suap.ifpi.edu.br", token="...") as client:
                 dados = client.comum.get_my_data()
     """
 
@@ -98,35 +100,46 @@ class SuapClient:
     def __init__(
         self,
         base_url: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
         token: Optional[str] = None,
     ) -> None:
-        """Inicializa o cliente, carregando a sessão salva ou usando credenciais manuais.
+        """Inicializa o cliente.
 
-        Se ``base_url`` for omitido, as configurações são lidas de
-        ``~/.suap/config.json`` e os tokens são recuperados do keyring do sistema.
+        Há três formas de uso:
+
+        1. **Sessão salva** (após ``suap login``): chame sem argumentos.
+        2. **Credenciais diretas**: passe ``base_url``, ``username`` e ``password``
+           para autenticar sem precisar da CLI.
+        3. **Token manual**: passe ``base_url`` e ``token`` para usar um
+           access token JWT já obtido.
 
         Args:
             base_url: URL base da instância do SUAP
-                (ex: ``"https://suap.ifpi.edu.br"``). Se ``None``, carrega
-                da configuração salva.
-            token: Access token JWT para uso imediato. Útil para testes ou
-                integração direta sem sessão salva.
+                (ex: ``"https://suap.ifpi.edu.br"``). Obrigatório nos modos
+                2 e 3; se ``None``, carrega da configuração salva.
+            username: Matrícula do aluno. Usado junto com ``password``
+                para autenticar automaticamente.
+            password: Senha da conta SUAP. Usado junto com ``username``
+                para autenticar automaticamente.
+            token: Access token JWT para uso imediato. Útil para testes
+                ou integração direta sem sessão salva.
 
         Raises:
-            SuapNotLoggedInError: Se ``base_url`` for ``None`` e não houver
-                configuração salva ou token no keyring.
+            SuapAuthError: Se ``username``/``password`` forem inválidos.
+            SuapNotLoggedInError: Se chamado sem argumentos e não houver
+                sessão salva, ou se o token salvo não for encontrado.
         """
         if base_url is not None:
             self.base_url = base_url.rstrip("/")
             self._access_token: Optional[str] = token
             self._refresh_token: Optional[str] = None
-            self._username: Optional[str] = None
+            self._username: Optional[str] = username
         else:
             config = load_config()
             self.base_url = config["base_url"].rstrip("/")
             self._username = config["username"]
-            self._access_token = keyring.get_password(KEYRING_ACCESS, self._username)
-            self._refresh_token = keyring.get_password(KEYRING_REFRESH, self._username)
+            self._access_token, self._refresh_token = load_tokens(self._username)
             if not self._access_token:
                 raise SuapNotLoggedInError(
                     "Token não encontrado. Execute `suap login`."
@@ -138,6 +151,9 @@ class SuapClient:
         self.token = TokenResource(self)
         self.comum = CommonResource(self)
         self.edu = EduResource(self)
+
+        if base_url is not None and username and password:
+            self.token.authenticate(username, password)
 
     def __enter__(self) -> "SuapClient":
         """Suporte a context manager — retorna a própria instância."""
@@ -155,7 +171,7 @@ class SuapClient:
         """Renova o access token usando o refresh token armazenado.
 
         Chamado automaticamente por :meth:`_do_request` ao receber HTTP 401.
-        Atualiza ``_access_token`` e ``_refresh_token`` na instância e no keyring.
+        Atualiza ``_access_token`` e ``_refresh_token`` na instância e no ficheiro de tokens.
 
         Raises:
             SuapTokenExpiredError: Se não houver refresh token disponível ou
@@ -184,8 +200,7 @@ class SuapClient:
         self._access_token = data["access"]
         self._refresh_token = data["refresh"]
         if self._username:
-            keyring.set_password(KEYRING_ACCESS, self._username, self._access_token)
-            keyring.set_password(KEYRING_REFRESH, self._username, self._refresh_token)
+            save_tokens(self._username, self._access_token, self._refresh_token)
 
     def _do_request(self, method: str, path: str, **kwargs: Any) -> Any:
         """Executa uma requisição autenticada e retorna o JSON."""

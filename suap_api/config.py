@@ -1,12 +1,13 @@
 import json
 import os
 from pathlib import Path
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 from .exceptions import SuapNotLoggedInError
 
 CONFIG_DIR = Path.home() / ".suap"
 CONFIG_FILE = CONFIG_DIR / "config.json"
+TOKENS_FILE = CONFIG_DIR / "tokens.json"
 
 
 class Config(TypedDict):
@@ -94,3 +95,59 @@ def clear_config() -> None:
     """
     if CONFIG_FILE.exists():
         CONFIG_FILE.unlink()
+
+
+def save_tokens(username: str, access: str, refresh: str) -> None:
+    """Persiste os tokens JWT em ``~/.suap/tokens.json`` com permissão ``600``.
+
+    Args:
+        username: Matrícula do utilizador, usada como chave.
+        access: Access token JWT.
+        refresh: Refresh token JWT.
+    """
+    CONFIG_DIR.mkdir(exist_ok=True)
+    data: dict = {}
+    if TOKENS_FILE.exists():
+        try:
+            data = json.loads(TOKENS_FILE.read_text())
+        except (json.JSONDecodeError, OSError):
+            data = {}
+    data[username] = {"access": access, "refresh": refresh}
+    TOKENS_FILE.write_text(json.dumps(data, indent=2))
+    os.chmod(TOKENS_FILE, 0o600)
+
+
+def load_tokens(username: str) -> tuple[Optional[str], Optional[str]]:
+    """Carrega os tokens JWT do utilizador a partir de ``~/.suap/tokens.json``.
+
+    Args:
+        username: Matrícula do utilizador.
+
+    Returns:
+        Tupla ``(access_token, refresh_token)``. Ambos podem ser ``None``
+        se o ficheiro não existir ou o utilizador não tiver tokens salvos.
+    """
+    if not TOKENS_FILE.exists():
+        return None, None
+    try:
+        data = json.loads(TOKENS_FILE.read_text())
+        entry = data.get(username, {})
+        return entry.get("access"), entry.get("refresh")
+    except (json.JSONDecodeError, OSError):
+        return None, None
+
+
+def clear_tokens(username: str) -> None:
+    """Remove os tokens do utilizador de ``~/.suap/tokens.json``.
+
+    Não levanta exceção caso o ficheiro ou o utilizador não existam.
+    """
+    if not TOKENS_FILE.exists():
+        return
+    try:
+        data = json.loads(TOKENS_FILE.read_text())
+        data.pop(username, None)
+        TOKENS_FILE.write_text(json.dumps(data, indent=2))
+        os.chmod(TOKENS_FILE, 0o600)
+    except (json.JSONDecodeError, OSError):
+        pass

@@ -29,11 +29,6 @@ pip install ".[dev]"
 
 Após a instalação, o comando `suap` estará disponível no terminal.
 
-> **WSL2 / Linux sem GUI:** instale o backend de keyring alternativo antes de usar:
-> ```bash
-> pip install keyrings.alt
-> ```
-
 ---
 
 ## Uso da CLI
@@ -52,7 +47,7 @@ Você será solicitado a informar:
 2. **Matrícula**
 3. **Senha** — ocultada durante a digitação
 
-Os tokens JWT são salvos de forma segura via `keyring`. A URL e a matrícula são salvas em `~/.suap/config.json` com permissão restrita (`600`).
+Os tokens JWT são salvos em `~/.suap/tokens.json` com permissão restrita (`600`). A URL e a matrícula são salvas em `~/.suap/config.json`, também com permissão `600`.
 
 ---
 
@@ -229,14 +224,17 @@ with SuapClient() as client:
     conclusao = client.get_graduation_requirements()
 ```
 
-Para uso sem sessão salva (passando credenciais manualmente):
+Para uso sem sessão salva (passando credenciais diretamente no código):
 
 ```python
 from suap_api import SuapClient
 
-with SuapClient(base_url="https://suap.ifpi.edu.br") as client:
-    access, refresh = client.authenticate("20221234", "sua_senha")
-    dados = client.get_my_data()
+with SuapClient(
+    base_url="https://suap.ifpi.edu.br",
+    username="20221234",
+    password="sua_senha",
+) as client:
+    dados = client.comum.get_my_data()
 ```
 
 ---
@@ -310,7 +308,7 @@ suap-api-wrapper/
 
 ## Segurança
 
-- Os tokens JWT **nunca** são escritos em disco — armazenados via `keyring`.
+- Os tokens JWT são armazenados em `~/.suap/tokens.json` com permissão `600` (somente o dono pode ler/escrever).
 - O arquivo `~/.suap/config.json` é criado com permissão `600` (somente o dono pode ler/escrever).
 - SSL é sempre verificado. Não há opção para desativá-lo.
 - Todas as requisições têm timeout de 10 segundos.
