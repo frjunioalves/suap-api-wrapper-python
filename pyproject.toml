@@ -61,6 +61,14 @@ suap = "suap_api.cli:main"
 [tool.hatch.build.targets.wheel]
 packages = ["suap_api"]
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/docs",
+    "/specs",
+    "/tests",
+    "/.github", # Boa prática excluir também arquivos do GitHub, se tiver
+]
+
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",

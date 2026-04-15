@@ -1,8 +1,10 @@
 site_name: suap-api-wrapper
 site_description: Python wrapper e CLI para a API v2 do SUAP
 site_author: Junio Alves
+site_url: https://junio-alves.github.io/suap-api-wrapper/
 repo_url: https://github.com/Junio-Alves/suap-api-wrapper
 repo_name: Junio-Alves/suap-api-wrapper
+copyright: "Copyright &copy; 2026 <a href='https://github.com/Junio-Alves'>Junio Alves</a> &mdash; Licenciado sob a <a href='https://github.com/Junio-Alves/suap-api-wrapper/blob/main/LICENSE'>MIT License</a>"
 
 theme:
   name: material
@@ -20,6 +22,16 @@ theme:
     - content.code.copy
     - search.highlight
     - search.suggest
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Junio-Alves
+      name: Junio Alves no GitHub
+    - icon: fontawesome/solid/envelope
+      link: mailto:frjunioalves@hotmail.com
+      name: frjunioalves@hotmail.com
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/suap-api-wrapper/
+      name: suap-api-wrapper no PyPI
 
 markdown_extensions:
   - attr_list

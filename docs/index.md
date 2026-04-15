@@ -13,7 +13,7 @@ Basta informar a URL da sua instância no primeiro login.
 
     ---
 
-    Instale via pip ou diretamente do repositório.
+    Instale via PyPI com `pip install suap-api-wrapper`.
 
     [→ Instalação](instalacao.md)
 
@@ -74,9 +74,7 @@ Basta informar a URL da sua instância no primeiro login.
 ### 1. Instale
 
 ```bash
-git clone https://github.com/Junio-Alves/suap-api-wrapper.git
-cd suap-api-wrapper
-pip install .
+pip install suap-api-wrapper
 ```
 
 ### 2. Faça login

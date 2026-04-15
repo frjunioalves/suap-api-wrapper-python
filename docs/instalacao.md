@@ -7,7 +7,21 @@
 
 ---
 
-## Instalação padrão
+## Instalação via PyPI (recomendado)
+
+```bash
+pip install suap-api-wrapper
+```
+
+Após a instalação, o comando `suap` estará disponível no terminal:
+
+```bash
+suap --help
+```
+
+---
+
+## Instalação a partir do código-fonte
 
 Clone o repositório e instale o pacote:
 
@@ -15,12 +29,6 @@ Clone o repositório e instale o pacote:
 git clone https://github.com/Junio-Alves/suap-api-wrapper.git
 cd suap-api-wrapper
 pip install .
-```
-
-Após a instalação, o comando `suap` estará disponível no terminal:
-
-```bash
-suap --help
 ```
 
 ---
