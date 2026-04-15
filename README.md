@@ -1,6 +1,10 @@
 # suap-api-wrapper
 
-CLI e biblioteca Python para interagir com a API do SUAP. Funciona com qualquer instituição que utilize o SUAP (IFPI, IFRN, IFCE, etc.), basta informar a URL da sua instância no login.
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-0.1.0-orange)
+
+CLI e biblioteca Python para interagir com a API v2 do SUAP. Funciona com qualquer instituição que utilize o SUAP (IFPI, IFRN, IFCE, etc.), basta informar a URL da sua instância no login.
 
 ---
 
@@ -16,7 +20,7 @@ CLI e biblioteca Python para interagir com a API do SUAP. Funciona com qualquer 
 Clone o repositório e instale o pacote:
 
 ```bash
-git clone https://github.com/seu-usuario/suap-api-wrapper.git
+git clone https://github.com/Junio-Alves/suap-api-wrapper.git
 cd suap-api-wrapper
 pip install .
 ```
@@ -312,3 +316,17 @@ suap-api-wrapper/
 - O arquivo `~/.suap/config.json` é criado com permissão `600` (somente o dono pode ler/escrever).
 - SSL é sempre verificado. Não há opção para desativá-lo.
 - Todas as requisições têm timeout de 10 segundos.
+
+---
+
+## Licença
+
+Distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+---
+
+## Autor
+
+**Junio Alves** — [frjunioalves@hotmail.com](mailto:frjunioalves@hotmail.com)
+
+Contribuições, issues e pull requests são bem-vindos!
