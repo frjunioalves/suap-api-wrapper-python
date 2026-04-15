@@ -5,6 +5,18 @@ import responses as rsps_lib
 
 from suap_api.client import SuapClient
 from suap_api.exceptions import SuapAuthError, SuapRequestError, SuapTokenExpiredError
+from suap_api.models import (
+    Aula,
+    DadosAcademicos,
+    DadosPessoais,
+    Diario,
+    Disciplina,
+    Material,
+    Periodo,
+    Professor,
+    RequisitosConclusao,
+    Trabalho,
+)
 
 BASE_URL = "https://suap.ifpi.edu.br"
 
@@ -68,7 +80,7 @@ class TestDoRequest:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/comum/meus-dados/",
-            json={"nome": "Aluno"},
+            json={"nome_usual": "Aluno"},
             status=200,
         )
         make_client().comum.get_my_data()
@@ -86,12 +98,12 @@ class TestDoRequest:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/comum/meus-dados/",
-            json={"nome": "Aluno"},
+            json={"nome_usual": "Aluno"},
             status=200,
         )
         client = make_client()
         data = client.comum.get_my_data()
-        assert data == {"nome": "Aluno"}
+        assert isinstance(data, DadosPessoais)
         assert client._access_token == "new-access"
 
     @rsps_lib.activate
@@ -123,10 +135,13 @@ class TestCommonResource:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/comum/meus-dados/",
-            json={"nome": "Aluno Teste"},
+            json={"nome_usual": "Aluno Teste", "matricula": "20221234"},
             status=200,
         )
-        assert make_client().comum.get_my_data()["nome"] == "Aluno Teste"
+        dados = make_client().comum.get_my_data()
+        assert isinstance(dados, DadosPessoais)
+        assert dados.nome_usual == "Aluno Teste"
+        assert dados.matricula == "20221234"
 
 
 # ------------------------------------------------------------------
@@ -139,50 +154,60 @@ class TestEduResource:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/periodos",
-            json=[{"semestre": "2024.1"}],
+            json=[{"semestre": "2024.1", "situacao": "Concluído"}],
             status=200,
         )
-        assert make_client().edu.get_periods() == [{"semestre": "2024.1"}]
+        periodos = make_client().edu.get_periods()
+        assert isinstance(periodos[0], Periodo)
+        assert periodos[0].semestre == "2024.1"
 
     @rsps_lib.activate
     def test_get_diaries(self) -> None:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/diarios/2024.1",
-            json=[{"id": 1}],
+            json=[{"id": 1, "disciplina": "Algoritmos"}],
             status=200,
         )
-        assert make_client().edu.get_diaries("2024.1")[0]["id"] == 1
+        diarios = make_client().edu.get_diaries("2024.1")
+        assert isinstance(diarios[0], Diario)
+        assert diarios[0].id == 1
 
     @rsps_lib.activate
     def test_get_diary_professors(self) -> None:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/diarios/42/professores",
-            json=[{"nome": "Prof"}],
+            json=[{"nome": "Prof", "email": "prof@ifpi.edu.br"}],
             status=200,
         )
-        assert make_client().edu.get_diary_professors(42) == [{"nome": "Prof"}]
+        professores = make_client().edu.get_diary_professors(42)
+        assert isinstance(professores[0], Professor)
+        assert professores[0].nome == "Prof"
 
     @rsps_lib.activate
     def test_get_diary_classes(self) -> None:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/diarios/42/aulas",
-            json=[{"data": "2024-03-01"}],
+            json=[{"data": "2024-03-01", "quantidade": 2, "faltas": 0}],
             status=200,
         )
-        assert make_client().edu.get_diary_classes(42) == [{"data": "2024-03-01"}]
+        aulas = make_client().edu.get_diary_classes(42)
+        assert isinstance(aulas[0], Aula)
+        assert aulas[0].data == "2024-03-01"
 
     @rsps_lib.activate
     def test_get_diary_materials(self) -> None:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/diarios/42/materiais",
-            json=[{"id": 5}],
+            json=[{"id": 5, "titulo": "Slide 1"}],
             status=200,
         )
-        assert make_client().edu.get_diary_materials(42)[0]["id"] == 5
+        materiais = make_client().edu.get_diary_materials(42)
+        assert isinstance(materiais[0], Material)
+        assert materiais[0].id == 5
 
     @rsps_lib.activate
     def test_get_material(self) -> None:
@@ -192,7 +217,9 @@ class TestEduResource:
             json={"id": 5, "titulo": "Slide 1"},
             status=200,
         )
-        assert make_client().edu.get_material(5)["titulo"] == "Slide 1"
+        material = make_client().edu.get_material(5)
+        assert isinstance(material, Material)
+        assert material.titulo == "Slide 1"
 
     @rsps_lib.activate
     def test_get_material_pdf(self) -> None:
@@ -209,40 +236,48 @@ class TestEduResource:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/diarios/42/trabalhos",
-            json=[{"titulo": "T1"}],
+            json=[{"id": 1, "titulo": "T1"}],
             status=200,
         )
-        assert make_client().edu.get_diary_assignments(42) == [{"titulo": "T1"}]
+        trabalhos = make_client().edu.get_diary_assignments(42)
+        assert isinstance(trabalhos[0], Trabalho)
+        assert trabalhos[0].titulo == "T1"
 
     @rsps_lib.activate
     def test_get_disciplines(self) -> None:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/disciplinas/2024.1",
-            json=[{"nome": "Algoritmos"}],
+            json=[{"disciplina": "Algoritmos", "situacao": "Aprovado"}],
             status=200,
         )
-        assert make_client().edu.get_disciplines("2024.1") == [{"nome": "Algoritmos"}]
+        disciplinas = make_client().edu.get_disciplines("2024.1")
+        assert isinstance(disciplinas[0], Disciplina)
+        assert disciplinas[0].disciplina == "Algoritmos"
 
     @rsps_lib.activate
     def test_get_student_data(self) -> None:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/meus-dados-aluno/",
-            json={"curso": "TADS"},
+            json={"curso": "TADS", "turma": "2022.1"},
             status=200,
         )
-        assert make_client().edu.get_student_data()["curso"] == "TADS"
+        dados = make_client().edu.get_student_data()
+        assert isinstance(dados, DadosAcademicos)
+        assert dados.curso == "TADS"
 
     @rsps_lib.activate
     def test_get_graduation_requirements(self) -> None:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/requisitos-conclusao/",
-            json={"ch_total": 3200},
+            json={"ch_total": 3200, "ch_cumprida": 1600},
             status=200,
         )
-        assert make_client().edu.get_graduation_requirements()["ch_total"] == 3200
+        conclusao = make_client().edu.get_graduation_requirements()
+        assert isinstance(conclusao, RequisitosConclusao)
+        assert conclusao.ch_total == 3200
 
 
 # ------------------------------------------------------------------

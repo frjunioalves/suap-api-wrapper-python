@@ -106,19 +106,19 @@ from suap_api import SuapClient, SuapNotFoundError
 with SuapClient() as client:
     # Dados pessoais
     dados = client.comum.get_my_data()
-    print(f"Olá, {dados['nome_usual']}!")
+    print(f"Olá, {dados.nome_usual}!")
 
     # Semestres e diários
     periodos = client.edu.get_periods()
-    ultimo = periodos[0]["semestre"]
+    ultimo = periodos[0].semestre
     diarios = client.edu.get_diaries(ultimo)
 
     for diario in diarios:
-        id_d = diario["id"]
+        id_d = diario.id
         try:
             materiais = client.edu.get_diary_materials(id_d)
             if materiais:
-                pdf = client.edu.get_material_pdf(id_d, materiais[0]["id"])
+                pdf = client.edu.get_material_pdf(id_d, materiais[0].id)
                 with open(f"material_{id_d}.pdf", "wb") as f:
                     f.write(pdf)
         except SuapNotFoundError:

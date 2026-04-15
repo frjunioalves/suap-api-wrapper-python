@@ -1,4 +1,16 @@
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING
+
+from ..models.edu import (
+    Aula,
+    DadosAcademicos,
+    Diario,
+    Disciplina,
+    Material,
+    Periodo,
+    Professor,
+    RequisitosConclusao,
+    Trabalho,
+)
 
 if TYPE_CHECKING:
     from ..client import SuapClient
@@ -16,26 +28,19 @@ class EduResource:
         >>> with SuapClient() as client:
         ...     periodos = client.edu.get_periods()
         ...     diarios = client.edu.get_diaries("2024.1")
-        ...     aulas = client.edu.get_diary_classes(diarios[0]["id"])
+        ...     aulas = client.edu.get_diary_classes(diarios[0].id)
     """
 
     def __init__(self, client: "SuapClient") -> None:
-        """Inicializa o recurso com uma referência ao cliente principal.
-
-        Args:
-            client: Instância de :class:`~suap_api.client.SuapClient` que
-                fornece a sessão autenticada e a URL base.
-        """
         self._client = client
 
-    def get_periods(self) -> List[Any]:
+    def get_periods(self) -> list[Periodo]:
         """Lista os semestres letivos do aluno.
 
         Realiza um ``GET /api/edu/periodos``.
 
         Returns:
-            Lista de dicionários, cada um representando um período letivo
-            com informações como ano, semestre e situação.
+            Lista de :class:`~suap_api.models.edu.Periodo`.
 
         Raises:
             SuapNotLoggedInError: Se não houver sessão ativa.
@@ -44,12 +49,13 @@ class EduResource:
 
         Example:
             >>> periodos = client.edu.get_periods()
-            >>> print(periodos[0]["semestre"])
+            >>> print(periodos[0].semestre)
             '2024.1'
         """
-        return self._client._do_request("GET", "/api/edu/periodos")
+        data = self._client._do_request("GET", "/api/edu/periodos")
+        return [Periodo.from_dict(p) for p in data]
 
-    def get_diaries(self, semestre: str) -> List[Any]:
+    def get_diaries(self, semestre: str) -> list[Diario]:
         """Lista os diários do aluno em um semestre letivo.
 
         Realiza um ``GET /api/edu/diarios/{semestre}``.
@@ -59,8 +65,7 @@ class EduResource:
                 (ex: ``"2024.1"``).
 
         Returns:
-            Lista de diários, cada um contendo o ``id`` do diário,
-            nome da disciplina e demais informações académicas.
+            Lista de :class:`~suap_api.models.edu.Diario`.
 
         Raises:
             SuapNotLoggedInError: Se não houver sessão ativa.
@@ -69,11 +74,12 @@ class EduResource:
 
         Example:
             >>> diarios = client.edu.get_diaries("2024.1")
-            >>> id_diario = diarios[0]["id"]
+            >>> id_diario = diarios[0].id
         """
-        return self._client._do_request("GET", f"/api/edu/diarios/{semestre}")
+        data = self._client._do_request("GET", f"/api/edu/diarios/{semestre}")
+        return [Diario.from_dict(d) for d in data]
 
-    def get_diary_professors(self, id_diario: int) -> List[Any]:
+    def get_diary_professors(self, id_diario: int) -> list[Professor]:
         """Lista os professores de um diário.
 
         Realiza um ``GET /api/edu/diarios/{id_diario}/professores``.
@@ -83,7 +89,7 @@ class EduResource:
                 :meth:`get_diaries`.
 
         Returns:
-            Lista de dicionários com nome e dados de cada professor.
+            Lista de :class:`~suap_api.models.edu.Professor`.
 
         Raises:
             SuapNotFoundError: Se o diário com o ID fornecido não existir.
@@ -92,10 +98,12 @@ class EduResource:
 
         Example:
             >>> professores = client.edu.get_diary_professors(42)
+            >>> print(professores[0].nome)
         """
-        return self._client._do_request("GET", f"/api/edu/diarios/{id_diario}/professores")
+        data = self._client._do_request("GET", f"/api/edu/diarios/{id_diario}/professores")
+        return [Professor.from_dict(p) for p in data]
 
-    def get_diary_classes(self, id_diario: int) -> List[Any]:
+    def get_diary_classes(self, id_diario: int) -> list[Aula]:
         """Lista as aulas registradas em um diário.
 
         Realiza um ``GET /api/edu/diarios/{id_diario}/aulas``.
@@ -105,7 +113,7 @@ class EduResource:
                 :meth:`get_diaries`.
 
         Returns:
-            Lista de aulas com data, conteúdo e número de faltas.
+            Lista de :class:`~suap_api.models.edu.Aula`.
 
         Raises:
             SuapNotFoundError: Se o diário com o ID fornecido não existir.
@@ -114,10 +122,12 @@ class EduResource:
 
         Example:
             >>> aulas = client.edu.get_diary_classes(42)
+            >>> print(aulas[0].data)
         """
-        return self._client._do_request("GET", f"/api/edu/diarios/{id_diario}/aulas")
+        data = self._client._do_request("GET", f"/api/edu/diarios/{id_diario}/aulas")
+        return [Aula.from_dict(a) for a in data]
 
-    def get_diary_materials(self, id_diario: int) -> List[Any]:
+    def get_diary_materials(self, id_diario: int) -> list[Material]:
         """Lista os materiais disponíveis em um diário.
 
         Realiza um ``GET /api/edu/diarios/{id_diario}/materiais``.
@@ -127,7 +137,7 @@ class EduResource:
                 :meth:`get_diaries`.
 
         Returns:
-            Lista de materiais, cada um com ``id``, título e tipo de arquivo.
+            Lista de :class:`~suap_api.models.edu.Material`.
 
         Raises:
             SuapNotFoundError: Se o diário com o ID fornecido não existir.
@@ -136,11 +146,12 @@ class EduResource:
 
         Example:
             >>> materiais = client.edu.get_diary_materials(42)
-            >>> id_material = materiais[0]["id"]
+            >>> id_material = materiais[0].id
         """
-        return self._client._do_request("GET", f"/api/edu/diarios/{id_diario}/materiais")
+        data = self._client._do_request("GET", f"/api/edu/diarios/{id_diario}/materiais")
+        return [Material.from_dict(m) for m in data]
 
-    def get_material(self, id_material: int) -> Dict[str, Any]:
+    def get_material(self, id_material: int) -> Material:
         """Obtém os detalhes de um material específico.
 
         Realiza um ``GET /api/edu/materiais/{id_material}``.
@@ -150,8 +161,7 @@ class EduResource:
                 :meth:`get_diary_materials`.
 
         Returns:
-            Dicionário com título, tipo, data de publicação e demais
-            metadados do material.
+            :class:`~suap_api.models.edu.Material` com os metadados do arquivo.
 
         Raises:
             SuapNotFoundError: Se o material com o ID fornecido não existir.
@@ -160,9 +170,10 @@ class EduResource:
 
         Example:
             >>> material = client.edu.get_material(10)
-            >>> print(material["titulo"])
+            >>> print(material.titulo)
         """
-        return self._client._do_request("GET", f"/api/edu/materiais/{id_material}")
+        data = self._client._do_request("GET", f"/api/edu/materiais/{id_material}")
+        return Material.from_dict(data)
 
     def get_material_pdf(self, id_diario: int, id_material: int) -> bytes:
         """Baixa o conteúdo PDF de um material.
@@ -197,7 +208,7 @@ class EduResource:
             url = "https://" + url[7:]
         return self._client._do_request_binary("GET", url, _absolute=True)
 
-    def get_diary_assignments(self, id_diario: int) -> List[Any]:
+    def get_diary_assignments(self, id_diario: int) -> list[Trabalho]:
         """Lista os trabalhos de um diário.
 
         Realiza um ``GET /api/edu/diarios/{id_diario}/trabalhos``.
@@ -207,7 +218,7 @@ class EduResource:
                 :meth:`get_diaries`.
 
         Returns:
-            Lista de trabalhos com título, descrição e prazo de entrega.
+            Lista de :class:`~suap_api.models.edu.Trabalho`.
 
         Raises:
             SuapNotFoundError: Se o diário com o ID fornecido não existir.
@@ -216,10 +227,12 @@ class EduResource:
 
         Example:
             >>> trabalhos = client.edu.get_diary_assignments(42)
+            >>> print(trabalhos[0].titulo)
         """
-        return self._client._do_request("GET", f"/api/edu/diarios/{id_diario}/trabalhos")
+        data = self._client._do_request("GET", f"/api/edu/diarios/{id_diario}/trabalhos")
+        return [Trabalho.from_dict(t) for t in data]
 
-    def get_disciplines(self, semestre: str) -> List[Any]:
+    def get_disciplines(self, semestre: str) -> list[Disciplina]:
         """Lista as disciplinas do aluno com notas e situação em um semestre.
 
         Realiza um ``GET /api/edu/disciplinas/{semestre}``.
@@ -229,8 +242,7 @@ class EduResource:
                 (ex: ``"2024.1"``).
 
         Returns:
-            Lista de disciplinas com notas por etapa, faltas e situação
-            final do aluno em cada uma.
+            Lista de :class:`~suap_api.models.edu.Disciplina`.
 
         Raises:
             SuapNotFoundError: Se o semestre informado não existir.
@@ -238,17 +250,18 @@ class EduResource:
 
         Example:
             >>> disciplinas = client.edu.get_disciplines("2024.1")
+            >>> print(disciplinas[0].disciplina)
         """
-        return self._client._do_request("GET", f"/api/edu/disciplinas/{semestre}")
+        data = self._client._do_request("GET", f"/api/edu/disciplinas/{semestre}")
+        return [Disciplina.from_dict(d) for d in data]
 
-    def get_student_data(self) -> Dict[str, Any]:
+    def get_student_data(self) -> DadosAcademicos:
         """Obtém os dados académicos do aluno com foco no curso.
 
         Realiza um ``GET /api/edu/meus-dados-aluno/``.
 
         Returns:
-            Dicionário com informações do curso, turma, situação de matrícula
-            e dados académicos relevantes do aluno autenticado.
+            :class:`~suap_api.models.edu.DadosAcademicos` com curso, turma e situação.
 
         Raises:
             SuapNotLoggedInError: Se não houver sessão ativa.
@@ -257,18 +270,18 @@ class EduResource:
 
         Example:
             >>> dados = client.edu.get_student_data()
-            >>> print(dados["curso"])
+            >>> print(dados.curso)
         """
-        return self._client._do_request("GET", "/api/edu/meus-dados-aluno/")
+        data = self._client._do_request("GET", "/api/edu/meus-dados-aluno/")
+        return DadosAcademicos.from_dict(data)
 
-    def get_graduation_requirements(self) -> Dict[str, Any]:
+    def get_graduation_requirements(self) -> RequisitosConclusao:
         """Obtém os requisitos de conclusão do curso do aluno autenticado.
 
         Realiza um ``GET /api/edu/requisitos-conclusao/``.
 
         Returns:
-            Dicionário com carga horária total exigida, carga horária
-            cumprida, componentes pendentes e situação geral de conclusão.
+            :class:`~suap_api.models.edu.RequisitosConclusao` com carga horária e pendências.
 
         Raises:
             SuapNotLoggedInError: Se não houver sessão ativa.
@@ -277,6 +290,7 @@ class EduResource:
 
         Example:
             >>> conclusao = client.edu.get_graduation_requirements()
-            >>> print(conclusao["ch_total"])
+            >>> print(conclusao.ch_total)
         """
-        return self._client._do_request("GET", "/api/edu/requisitos-conclusao/")
+        data = self._client._do_request("GET", "/api/edu/requisitos-conclusao/")
+        return RequisitosConclusao.from_dict(data)

@@ -11,6 +11,18 @@ from .exceptions import (
     SuapTokenExpiredError,
     SuapValidationError,
 )
+from .models import (
+    Aula,
+    DadosAcademicos,
+    DadosPessoais,
+    Diario,
+    Disciplina,
+    Material,
+    Periodo,
+    Professor,
+    RequisitosConclusao,
+    Trabalho,
+)
 
 __all__ = [
     "SuapClient",
@@ -24,4 +36,14 @@ __all__ = [
     "SuapNotFoundError",
     "SuapForbiddenError",
     "SuapServerError",
+    "DadosPessoais",
+    "Periodo",
+    "Diario",
+    "Professor",
+    "Aula",
+    "Material",
+    "Trabalho",
+    "Disciplina",
+    "DadosAcademicos",
+    "RequisitosConclusao",
 ]

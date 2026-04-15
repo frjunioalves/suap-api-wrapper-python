@@ -8,4 +8,4 @@ with SuapClient() as client:
     material = client.edu.get_material(109248)                                                                                           
     materialpdf = client.edu.get_material_pdf(63895, 96840)  
 
-print(materialpdf)
+print(diarios)

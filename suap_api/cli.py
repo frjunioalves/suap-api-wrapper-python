@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import sys
 import termios
@@ -88,8 +89,16 @@ def _prompt_password(prompt: str = "Senha") -> str:
     return "".join(password)
 
 
+def _to_serializable(data: object) -> object:
+    if dataclasses.is_dataclass(data) and not isinstance(data, type):
+        return dataclasses.asdict(data)  # type: ignore[arg-type]
+    if isinstance(data, list):
+        return [_to_serializable(item) for item in data]
+    return data
+
+
 def _print_json(data: object) -> None:
-    click.echo(json.dumps(data, indent=2, ensure_ascii=False))
+    click.echo(json.dumps(_to_serializable(data), indent=2, ensure_ascii=False))
 
 
 @click.group()

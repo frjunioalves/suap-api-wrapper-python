@@ -33,20 +33,14 @@ def enviar_mensagem(texto: str) -> None:
 
 with SuapClient() as client:
     periodos = client.edu.get_periods()
-    semestre = periodos[0]["semestre"]
-    diarios = client.edu.get_diaries(semestre)
+    semestre = periodos[0].semestre
+    disciplinas = client.edu.get_disciplines(semestre)
 
     linhas = [f"📋 *Notas — {semestre}*\n"]
 
-    for diario in diarios:
-        disciplina = diario["disciplina"]
-        notas = diario.get("notas", {})
-        n1 = notas.get("nota_etapa_1", {}).get("nota", "—")
-        n2 = notas.get("nota_etapa_2", {}).get("nota", "—")
-        freq = diario.get("percentual_carga_horaria_frequentada", "—")
-
-        linhas.append(f"📘 *{disciplina}*")
-        linhas.append(f"   Etapa 1: `{n1}` | Etapa 2: `{n2}` | Freq: `{freq}%`")
+    for d in disciplinas:
+        linhas.append(f"📘 *{d.disciplina}*")
+        linhas.append(f"   Etapa 1: `{d.nota_etapa_1}` | Etapa 2: `{d.nota_etapa_2}` | Situação: `{d.situacao}`")
 
     enviar_mensagem("\n".join(linhas))
     print("Mensagem enviada!")

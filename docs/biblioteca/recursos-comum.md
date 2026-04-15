@@ -21,29 +21,30 @@ Obtém os dados pessoais do usuário autenticado.
 
 **Endpoint:** `GET /api/comum/meus-dados/`
 
-**Retorno:** `dict`
+**Retorno:** `DadosPessoais`
 
 ```python
 dados = client.comum.get_my_data()
+print(dados.nome_usual)   # "João da Silva"
+print(dados.matricula)    # "20221234TADS0014"
+print(dados.email)        # "joao.silva@academico.ifpi.edu.br"
 ```
 
-**Exemplo de retorno:**
+**Atributos disponíveis:**
 
-```json
-{
-  "id": 1234,
-  "matricula": "20221234TADS0014",
-  "nome_usual": "João da Silva",
-  "cpf": "***.***.***-**",
-  "rg": "1234567",
-  "email": "joao.silva@academico.ifpi.edu.br",
-  "tipo_sanguineo": "O+",
-  "foto": "https://suap.ifpi.edu.br/media/foto.jpg",
-  "data_nascimento": "2000-01-01",
-  "naturalidade": "Teresina",
-  "tipo_vinculo": "Aluno"
-}
-```
+| Atributo | Tipo |
+|---|---|
+| `id` | `int` |
+| `matricula` | `str` |
+| `nome_usual` | `str` |
+| `cpf` | `str` |
+| `rg` | `str` |
+| `email` | `str` |
+| `tipo_sanguineo` | `str` |
+| `foto` | `str` |
+| `data_nascimento` | `str` |
+| `naturalidade` | `str` |
+| `tipo_vinculo` | `str` |
 
 **Exceções:**
 

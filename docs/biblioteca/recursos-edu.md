@@ -21,11 +21,16 @@ Lista os semestres letivos do aluno.
 
 **Endpoint:** `GET /api/edu/periodos`
 
-**Retorno:** `list`
+**Retorno:** `list[Periodo]`
+
+| Atributo | Tipo |
+|---|---|
+| `semestre` | `str` |
+| `situacao` | `str` |
 
 ```python
 periodos = client.edu.get_periods()
-# [{"semestre": "2024.2", ...}, {"semestre": "2024.1", ...}]
+print(periodos[0].semestre)  # "2024.2"
 ```
 
 **Exceções:** `SuapNotLoggedInError`, `SuapTokenExpiredError`, `SuapConnectionError`
@@ -44,11 +49,18 @@ Lista os diários do aluno em um semestre letivo.
 |---|---|---|
 | `semestre` | `str` | Semestre no formato `"AAAA.P"` (ex: `"2024.1"`) |
 
-**Retorno:** `list` — cada item contém `id`, `disciplina`, `situacao` e outros campos.
+**Retorno:** `list[Diario]`
+
+| Atributo | Tipo |
+|---|---|
+| `id` | `int` |
+| `disciplina` | `str` |
+| `componente_curricular` | `str` |
+| `situacao` | `str` |
 
 ```python
 diarios = client.edu.get_diaries("2024.1")
-id_diario = diarios[0]["id"]
+id_diario = diarios[0].id
 ```
 
 **Exceções:** `SuapNotLoggedInError`, `SuapNotFoundError`, `SuapConnectionError`
@@ -67,10 +79,16 @@ Lista os professores de um diário.
 |---|---|---|
 | `id_diario` | `int` | ID do diário, obtido via `get_diaries()` |
 
-**Retorno:** `list`
+**Retorno:** `list[Professor]`
+
+| Atributo | Tipo |
+|---|---|
+| `nome` | `str` |
+| `email` | `str` |
 
 ```python
 professores = client.edu.get_diary_professors(42)
+print(professores[0].nome)
 ```
 
 **Exceções:** `SuapNotFoundError`, `SuapValidationError`, `SuapConnectionError`
@@ -89,10 +107,18 @@ Lista as aulas registradas em um diário.
 |---|---|---|
 | `id_diario` | `int` | ID do diário, obtido via `get_diaries()` |
 
-**Retorno:** `list` — cada item contém `data`, `quantidade`, `conteudo` e `faltas`.
+**Retorno:** `list[Aula]`
+
+| Atributo | Tipo |
+|---|---|
+| `data` | `str` |
+| `quantidade` | `int` |
+| `conteudo` | `str` |
+| `faltas` | `int` |
 
 ```python
 aulas = client.edu.get_diary_classes(42)
+print(aulas[0].data, aulas[0].faltas)
 ```
 
 **Exceções:** `SuapNotFoundError`, `SuapValidationError`, `SuapConnectionError`
@@ -111,11 +137,19 @@ Lista os materiais disponíveis em um diário.
 |---|---|---|
 | `id_diario` | `int` | ID do diário, obtido via `get_diaries()` |
 
-**Retorno:** `list` — cada item contém `id`, `titulo` e `tipo`.
+**Retorno:** `list[Material]`
+
+| Atributo | Tipo |
+|---|---|
+| `id` | `int` |
+| `titulo` | `str` |
+| `tipo` | `str` |
+| `data_publicacao` | `str` |
+| `descricao` | `str` |
 
 ```python
 materiais = client.edu.get_diary_materials(42)
-id_material = materiais[0]["id"]
+id_material = materiais[0].id
 ```
 
 **Exceções:** `SuapNotFoundError`, `SuapValidationError`, `SuapConnectionError`
@@ -134,11 +168,11 @@ Obtém os detalhes de um material específico.
 |---|---|---|
 | `id_material` | `int` | ID do material, obtido via `get_diary_materials()` |
 
-**Retorno:** `dict`
+**Retorno:** `Material`
 
 ```python
 material = client.edu.get_material(10)
-print(material["titulo"])
+print(material.titulo)
 ```
 
 **Exceções:** `SuapNotFoundError`, `SuapValidationError`, `SuapConnectionError`
@@ -163,7 +197,6 @@ Baixa o conteúdo binário de um material em PDF.
 ```python
 pdf_bytes = client.edu.get_material_pdf(42, 10)
 
-# Salvar em arquivo
 with open("aula.pdf", "wb") as f:
     f.write(pdf_bytes)
 ```
@@ -184,10 +217,18 @@ Lista os trabalhos de um diário.
 |---|---|---|
 | `id_diario` | `int` | ID do diário, obtido via `get_diaries()` |
 
-**Retorno:** `list` — cada item contém `titulo`, `descricao` e `data_entrega`.
+**Retorno:** `list[Trabalho]`
+
+| Atributo | Tipo |
+|---|---|
+| `id` | `int` |
+| `titulo` | `str` |
+| `descricao` | `str` |
+| `data_entrega` | `str` |
 
 ```python
 trabalhos = client.edu.get_diary_assignments(42)
+print(trabalhos[0].titulo)
 ```
 
 **Exceções:** `SuapNotFoundError`, `SuapValidationError`, `SuapConnectionError`
@@ -206,12 +247,21 @@ Lista as disciplinas com notas, faltas e situação final.
 |---|---|---|
 | `semestre` | `str` | Semestre no formato `"AAAA.P"` (ex: `"2024.1"`) |
 
-**Retorno:** `list`
+**Retorno:** `list[Disciplina]`
+
+| Atributo | Tipo |
+|---|---|
+| `disciplina` | `str` |
+| `nota_etapa_1` | `Any` |
+| `nota_etapa_2` | `Any` |
+| `media` | `Any` |
+| `faltas` | `int` |
+| `situacao` | `str` |
 
 ```python
 disciplinas = client.edu.get_disciplines("2024.1")
 for d in disciplinas:
-    print(d["disciplina"], d["situacao"])
+    print(d.disciplina, d.situacao)
 ```
 
 **Exceções:** `SuapNotFoundError`, `SuapConnectionError`
@@ -224,11 +274,17 @@ Obtém os dados acadêmicos do aluno com foco no curso.
 
 **Endpoint:** `GET /api/edu/meus-dados-aluno/`
 
-**Retorno:** `dict` — curso, turma, situação de matrícula.
+**Retorno:** `DadosAcademicos`
+
+| Atributo | Tipo |
+|---|---|
+| `curso` | `str` |
+| `turma` | `str` |
+| `situacao` | `str` |
 
 ```python
 dados = client.edu.get_student_data()
-print(dados["curso"])
+print(dados.curso)
 ```
 
 **Exceções:** `SuapNotLoggedInError`, `SuapTokenExpiredError`, `SuapConnectionError`
@@ -241,11 +297,17 @@ Obtém os requisitos de conclusão do curso.
 
 **Endpoint:** `GET /api/edu/requisitos-conclusao/`
 
-**Retorno:** `dict` — carga horária total exigida, cumprida, componentes pendentes.
+**Retorno:** `RequisitosConclusao`
+
+| Atributo | Tipo |
+|---|---|
+| `ch_total` | `int` |
+| `ch_cumprida` | `int` |
+| `pendencias` | `Any` |
 
 ```python
 conclusao = client.edu.get_graduation_requirements()
-print(conclusao["ch_total"])
+print(conclusao.ch_total)
 ```
 
 **Exceções:** `SuapNotLoggedInError`, `SuapTokenExpiredError`, `SuapConnectionError`

@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING
+
+from ..models.comum import DadosPessoais
 
 if TYPE_CHECKING:
     from ..client import SuapClient
@@ -14,26 +16,19 @@ class CommonResource:
     Example:
         >>> with SuapClient() as client:
         ...     dados = client.comum.get_my_data()
-        ...     print(dados["nome"])
+        ...     print(dados.nome_usual)
     """
 
     def __init__(self, client: "SuapClient") -> None:
-        """Inicializa o recurso com uma referência ao cliente principal.
-
-        Args:
-            client: Instância de :class:`~suap_api.client.SuapClient` que
-                fornece a sessão autenticada e a URL base.
-        """
         self._client = client
 
-    def get_my_data(self) -> Dict[str, Any]:
+    def get_my_data(self) -> DadosPessoais:
         """Obtém os dados pessoais do utilizador autenticado.
 
         Realiza um ``GET /api/comum/meus-dados/``.
 
         Returns:
-            Dicionário com os dados do perfil, incluindo nome, matrícula,
-            e-mail, foto e informações de vínculo institucional.
+            :class:`~suap_api.models.comum.DadosPessoais` com os dados do perfil.
 
         Raises:
             SuapNotLoggedInError: Se não houver sessão ativa.
@@ -42,7 +37,8 @@ class CommonResource:
 
         Example:
             >>> dados = client.comum.get_my_data()
-            >>> print(dados["nome"])
+            >>> print(dados.nome_usual)
             'João da Silva'
         """
-        return self._client._do_request("GET", "/api/comum/meus-dados/")
+        data = self._client._do_request("GET", "/api/comum/meus-dados/")
+        return DadosPessoais.from_dict(data)

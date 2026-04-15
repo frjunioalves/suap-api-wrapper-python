@@ -11,29 +11,22 @@ from suap_api import SuapClient
 
 with SuapClient() as client:
     dados = client.comum.get_my_data()
-    print(f"Aluno: {dados['nome_usual']} ({dados['matricula']})\n")
+    print(f"Aluno: {dados.nome_usual} ({dados.matricula})\n")
 
     periodos = client.edu.get_periods()
-    semestre_atual = periodos[0]["semestre"]
+    semestre_atual = periodos[0].semestre
     print(f"Semestre: {semestre_atual}")
     print("-" * 40)
 
-    diarios = client.edu.get_diaries(semestre_atual)
+    disciplinas = client.edu.get_disciplines(semestre_atual)
 
-    for diario in diarios:
-        disciplina = diario["disciplina"]
-        situacao = diario.get("situacao", "—")
-        frequencia = diario.get("percentual_carga_horaria_frequentada", "—")
-
-        notas = diario.get("notas", {})
-        n1 = notas.get("nota_etapa_1", {}).get("nota", "—")
-        n2 = notas.get("nota_etapa_2", {}).get("nota", "—")
-
-        print(f"📘 {disciplina}")
-        print(f"   Nota 1ª etapa : {n1}")
-        print(f"   Nota 2ª etapa : {n2}")
-        print(f"   Frequência    : {frequencia}%")
-        print(f"   Situação      : {situacao}")
+    for d in disciplinas:
+        print(f"📘 {d.disciplina}")
+        print(f"   Nota 1ª etapa : {d.nota_etapa_1}")
+        print(f"   Nota 2ª etapa : {d.nota_etapa_2}")
+        print(f"   Média         : {d.media}")
+        print(f"   Faltas        : {d.faltas}")
+        print(f"   Situação      : {d.situacao}")
         print()
 ```
 
