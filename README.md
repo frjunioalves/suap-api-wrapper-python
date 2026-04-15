@@ -1,4 +1,4 @@
-# suap-api-wrapper
+# suap-api-wrapper 🎓
 
 ![PyPI](https://img.shields.io/pypi/v/suap-api-wrapper)
 ![Python](https://img.shields.io/pypi/pyversions/suap-api-wrapper)
@@ -7,16 +7,18 @@
 
 CLI e biblioteca Python para interagir com a API v2 do SUAP. Funciona com qualquer instituição que utilize o SUAP (IFPI, IFRN, IFCE, etc.), basta informar a URL da sua instância no login.
 
+📚 **[Documentação completa](https://frjunioalves.github.io/suap-api-wrapper-python)**
+
 ---
 
-## Requisitos
+## ⚙️ Requisitos
 
 - Python 3.8+
 - pip
 
 ---
 
-## Instalação
+## 📦 Instalação
 
 Instale diretamente do PyPI:
 
@@ -42,7 +44,7 @@ pip install ".[dev]"
 
 ---
 
-## Uso da CLI
+## 🖥️ Uso da CLI
 
 ### Login
 
@@ -187,7 +189,7 @@ suap conclusao
 
 ---
 
-## Fluxo típico de uso
+## 🚀 Fluxo típico de uso
 
 ```bash
 # 1. Login
@@ -210,7 +212,7 @@ suap material-pdf 42 10 -o aula1.pdf
 
 ---
 
-## Uso como biblioteca
+## 🐍 Uso como biblioteca
 
 ```python
 from suap_api import SuapClient
@@ -250,7 +252,7 @@ with SuapClient(
 
 ---
 
-## Tratamento de erros
+## ⚠️ Tratamento de erros
 
 Todas as exceções herdam de `SuapError`:
 
@@ -280,7 +282,7 @@ except SuapValidationError as e:
 
 ---
 
-## Desenvolvimento
+## 🛠️ Desenvolvimento
 
 ### Rodando os testes
 
@@ -296,7 +298,7 @@ mypy suap_api/
 
 ---
 
-## Estrutura do projeto
+## 📁 Estrutura do projeto
 
 ```
 suap-api-wrapper/
@@ -317,7 +319,7 @@ suap-api-wrapper/
 
 ---
 
-## Segurança
+## 🔒 Segurança
 
 - Os tokens JWT são armazenados em `~/.suap/tokens.json` com permissão `600` (somente o dono pode ler/escrever).
 - O arquivo `~/.suap/config.json` é criado com permissão `600` (somente o dono pode ler/escrever).
@@ -326,13 +328,13 @@ suap-api-wrapper/
 
 ---
 
-## Licença
+## 📄 Licença
 
 Distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
 ---
 
-## Autor
+## 👤 Autor
 
 **Junio Alves** — [frjunioalves@hotmail.com](mailto:frjunioalves@hotmail.com) — [github.com/Junio-Alves](https://github.com/Junio-Alves)
 

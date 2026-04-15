@@ -53,6 +53,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/Junio-Alves/suap-api-wrapper"
 Repository = "https://github.com/Junio-Alves/suap-api-wrapper"
+Documentation = "https://frjunioalves.github.io/suap-api-wrapper-python"
 "Bug Tracker" = "https://github.com/Junio-Alves/suap-api-wrapper/issues"
 
 [project.scripts]
