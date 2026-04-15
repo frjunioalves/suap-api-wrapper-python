@@ -1,10 +1,11 @@
-from .comum import DadosPessoais
+from .comum import DadosPessoais, Vinculo
 from .edu import (
     Aula,
     DadosAcademicos,
     Diario,
     Disciplina,
     Material,
+    Mensagem,
     Periodo,
     Professor,
     RequisitosConclusao,
@@ -13,6 +14,7 @@ from .edu import (
 
 __all__ = [
     "DadosPessoais",
+    "Vinculo",
     "Periodo",
     "Diario",
     "Professor",
@@ -20,6 +22,7 @@ __all__ = [
     "Material",
     "Trabalho",
     "Disciplina",
+    "Mensagem",
     "DadosAcademicos",
     "RequisitosConclusao",
 ]

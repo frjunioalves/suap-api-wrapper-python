@@ -39,9 +39,12 @@ class Professor:
 
 @dataclasses.dataclass
 class Aula:
+    id: Optional[int] = None
+    etapa: Optional[str] = None
     data: Optional[str] = None
-    quantidade: Optional[int] = None
     conteudo: Optional[str] = None
+    qtd_aulas: Optional[int] = None
+    quantidade: Optional[int] = None  # mantido por compatibilidade
     faltas: Optional[int] = None
 
     @classmethod
@@ -79,7 +82,9 @@ class Trabalho:
 
 @dataclasses.dataclass
 class Disciplina:
+    id_diario: Optional[int] = None
     disciplina: Optional[str] = None
+    carga_horaria: Optional[int] = None
     nota_etapa_1: Optional[Any] = None
     nota_etapa_2: Optional[Any] = None
     media: Optional[Any] = None
@@ -88,6 +93,20 @@ class Disciplina:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Disciplina":
+        known = {f.name for f in dataclasses.fields(cls)}
+        return cls(**{k: v for k, v in data.items() if k in known})
+
+
+@dataclasses.dataclass
+class Mensagem:
+    id: Optional[int] = None
+    assunto: Optional[str] = None
+    remetente: Optional[str] = None
+    data_envio: Optional[str] = None
+    lida: Optional[bool] = None
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Mensagem":
         known = {f.name for f in dataclasses.fields(cls)}
         return cls(**{k: v for k, v in data.items() if k in known})
 

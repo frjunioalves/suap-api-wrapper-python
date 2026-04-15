@@ -18,10 +18,12 @@ from .models import (
     Diario,
     Disciplina,
     Material,
+    Mensagem,
     Periodo,
     Professor,
     RequisitosConclusao,
     Trabalho,
+    Vinculo,
 )
 
 __all__ = [
@@ -37,6 +39,7 @@ __all__ = [
     "SuapForbiddenError",
     "SuapServerError",
     "DadosPessoais",
+    "Vinculo",
     "Periodo",
     "Diario",
     "Professor",
@@ -44,6 +47,7 @@ __all__ = [
     "Material",
     "Trabalho",
     "Disciplina",
+    "Mensagem",
     "DadosAcademicos",
     "RequisitosConclusao",
 ]

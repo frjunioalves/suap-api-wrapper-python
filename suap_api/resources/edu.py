@@ -6,6 +6,7 @@ from ..models.edu import (
     Diario,
     Disciplina,
     Material,
+    Mensagem,
     Periodo,
     Professor,
     RequisitosConclusao,
@@ -294,3 +295,27 @@ class EduResource:
         """
         data = self._client._do_request("GET", "/api/edu/requisitos-conclusao/")
         return RequisitosConclusao.from_dict(data)
+
+    def get_messages(self, status: str = "nao_lidas") -> list[Mensagem]:
+        """Lista as mensagens/avisos do aluno.
+
+        Realiza um ``GET /api/edu/mensagens/entrada/{status}/``.
+
+        Args:
+            status: Filtro de leitura. Valores comuns: ``"nao_lidas"``,
+                ``"lidas"``, ``"todas"``.
+
+        Returns:
+            Lista de :class:`~suap_api.models.edu.Mensagem`.
+
+        Raises:
+            SuapNotLoggedInError: Se não houver sessão ativa.
+            SuapTokenExpiredError: Se o token expirar e não puder ser renovado.
+            SuapConnectionError: Se não for possível conectar ao servidor.
+
+        Example:
+            >>> mensagens = client.edu.get_messages()
+            >>> print(mensagens[0].assunto)
+        """
+        data = self._client._do_request("GET", f"/api/edu/mensagens/entrada/{status}/")
+        return [Mensagem.from_dict(m) for m in data]
