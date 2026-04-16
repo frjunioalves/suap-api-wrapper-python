@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/icon/image.png" alt="suap-api-wrapper logo" width="200"/>
+</p>
+
 # suap-api-wrapper 🎓
 
 ![PyPI](https://img.shields.io/pypi/v/suap-api-wrapper)
