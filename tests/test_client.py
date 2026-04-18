@@ -202,7 +202,7 @@ class TestEduResource:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/diarios/42/materiais",
-            json=[{"id": 5, "titulo": "Slide 1"}],
+            json=[{"id": 5, "data": "2024-03-01", "descricao": "Slide 1", "url": None}],
             status=200,
         )
         materiais = make_client().edu.get_diary_materials(42)
@@ -214,12 +214,12 @@ class TestEduResource:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/materiais/5",
-            json={"id": 5, "titulo": "Slide 1"},
+            json={"id": 5, "data": "2024-03-01", "descricao": "Slide 1", "url": None},
             status=200,
         )
         material = make_client().edu.get_material(5)
         assert isinstance(material, Material)
-        assert material.titulo == "Slide 1"
+        assert material.descricao == "Slide 1"
 
     @rsps_lib.activate
     def test_get_material_pdf(self) -> None:
@@ -248,12 +248,24 @@ class TestEduResource:
         rsps_lib.add(
             rsps_lib.GET,
             f"{BASE_URL}/api/edu/disciplinas/2024.1",
-            json=[{"disciplina": "Algoritmos", "situacao": "Aprovado"}],
+            json=[{
+                "id": 1,
+                "nome": "Algoritmos",
+                "sigla": "TEC.0001",
+                "situacao": {"rotulo": "Cursando", "status": "info"},
+                "ch_total_aula": 60,
+                "qtd_faltas": 2,
+                "frequencia": 90.0,
+                "notas": [{"tipo": "N1", "nota": None}],
+                "medias": [{"tipo": "MD", "nota": None}],
+            }],
             status=200,
         )
         disciplinas = make_client().edu.get_disciplines("2024.1")
         assert isinstance(disciplinas[0], Disciplina)
-        assert disciplinas[0].disciplina == "Algoritmos"
+        assert disciplinas[0].nome == "Algoritmos"
+        assert disciplinas[0].id == 1
+        assert disciplinas[0].qtd_faltas == 2
 
     @rsps_lib.activate
     def test_get_student_data(self) -> None:

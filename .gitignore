@@ -1,3 +1,8 @@
 .venv
 site/
 dist/
+main.py
+.pytest_cache/
+__pycache__/
+*.pyc
+*.claude
