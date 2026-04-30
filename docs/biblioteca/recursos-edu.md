@@ -11,6 +11,9 @@ with SuapClient() as client:
     periodos = client.edu.get_periods()
 ```
 
+!!! tip "JSON original"
+    Todo objeto retornado por este recurso expõe `.raw` com o dicionário original da API. Consulte [Acesso ao JSON original](index.md#acesso-ao-json-original) para mais detalhes.
+
 ---
 
 ## Métodos
@@ -262,6 +265,10 @@ Lista as disciplinas com notas, faltas e situação final.
 disciplinas = client.edu.get_disciplines("2024.1")
 for d in disciplinas:
     print(d.disciplina, d.situacao)
+
+# Acesso ao JSON original, inclusive notas aninhadas
+print(disciplinas[0].raw)
+print(disciplinas[0].notas[0].raw)
 ```
 
 **Exceções:** `SuapNotFoundError`, `SuapConnectionError`

@@ -1,6 +1,8 @@
 import dataclasses
 from typing import Any, List, Optional
 
+from .base import RawMixin
+
 # Strings que a API retorna no lugar de ausência de dados real
 _GARBAGE_STRINGS = {"NoneNone", "None - / -", "-", ""}
 
@@ -13,7 +15,7 @@ def _sanitize_str(value: Optional[str]) -> Optional[str]:
 
 
 @dataclasses.dataclass
-class Vinculo:
+class Vinculo(RawMixin):
     id: Optional[int] = None
     matricula: Optional[str] = None
     nome: Optional[str] = None
@@ -31,15 +33,17 @@ class Vinculo:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Vinculo":
-        known = {f.name for f in dataclasses.fields(cls)}
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
         filtered = {k: v for k, v in data.items() if k in known}
         filtered["linha_pesquisa"] = _sanitize_str(filtered.get("linha_pesquisa"))
         filtered["curriculo_lattes"] = _sanitize_str(filtered.get("curriculo_lattes"))
-        return cls(**filtered)
+        obj = cls(**filtered)
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class DadosPessoais:
+class DadosPessoais(RawMixin):
     id: Optional[int] = None
     matricula: Optional[str] = None
     nome_usual: Optional[str] = None
@@ -58,7 +62,7 @@ class DadosPessoais:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "DadosPessoais":
-        known = {f.name for f in dataclasses.fields(cls)}
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
         filtered: dict[str, Any] = {k: v for k, v in data.items() if k in known}
 
         # Trata strings-lixo em campos de texto simples
@@ -75,4 +79,6 @@ class DadosPessoais:
         if isinstance(raw_vinculo, dict):
             filtered["vinculo"] = Vinculo.from_dict(raw_vinculo)
 
-        return cls(**filtered)
+        obj = cls(**filtered)
+        obj._raw = data
+        return obj

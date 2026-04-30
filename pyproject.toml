@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "suap-api-wrapper"
-version = "0.1.0"
+version = "0.2.0"
 description = "Python wrapper e CLI para a API v2 do SUAP — compatível com qualquer instituição que utilize o SUAP (IFPI, IFRN, IFCE, etc.)"
 readme = "README.md"
 license = { text = "MIT" }

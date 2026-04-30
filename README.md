@@ -254,6 +254,20 @@ with SuapClient(
     dados = client.comum.get_my_data()
 ```
 
+### Acesso ao JSON original
+
+Todo objeto retornado pela biblioteca expõe um atributo `.raw` com o dicionário original recebido da API, antes de qualquer conversão ou limpeza. Útil para depuração, log ou acesso a campos não mapeados nos modelos.
+
+```python
+with SuapClient() as client:
+    dados = client.comum.get_my_data()
+    print(dados.raw)            # dict completo retornado pela API
+
+    disciplinas = client.edu.get_disciplines("2024.1")
+    print(disciplinas[0].raw)   # dict da primeira disciplina
+    print(disciplinas[0].notas[0].raw)  # dict da primeira nota
+```
+
 ---
 
 ## ⚠️ Tratamento de erros

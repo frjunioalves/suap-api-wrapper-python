@@ -1,42 +1,50 @@
 import dataclasses
 from typing import Any, Optional
 
+from .base import RawMixin
+
 
 @dataclasses.dataclass
-class Periodo:
+class Periodo(RawMixin):
     id: Optional[int] = None
     semestre: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Periodo":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Horario:
+class Horario(RawMixin):
     dia: Optional[str] = None
     horario: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Horario":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Local:
+class Local(RawMixin):
     id: Optional[int] = None
     sala: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Local":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Diario:
+class Diario(RawMixin):
     id: Optional[int] = None
     disciplina: Optional[Any] = None
     professor: Optional[list] = None
@@ -49,24 +57,28 @@ class Diario:
         professor = [Professor.from_dict(p) for p in (data.get("professor") or [])]
         horario = [Horario.from_dict(h) for h in (data.get("horario") or [])]
         local = Local.from_dict(data["local"]) if data.get("local") else None
-        known = {f.name for f in dataclasses.fields(cls)} - {"professor", "horario", "local"}
-        return cls(**{k: v for k, v in data.items() if k in known}, professor=professor, horario=horario, local=local)
+        known = {f.name for f in dataclasses.fields(cls)} - {"professor", "horario", "local", "_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known}, professor=professor, horario=horario, local=local)
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Professor:
+class Professor(RawMixin):
     id: Optional[int] = None
     nome: Optional[str] = None
     email: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Professor":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Aula:
+class Aula(RawMixin):
     id: Optional[int] = None
     etapa: Optional[str] = None
     data: Optional[str] = None
@@ -76,12 +88,14 @@ class Aula:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Aula":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Material:
+class Material(RawMixin):
     id: Optional[int] = None
     data: Optional[str] = None
     descricao: Optional[str] = None
@@ -89,12 +103,14 @@ class Material:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Material":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Trabalho:
+class Trabalho(RawMixin):
     id: Optional[int] = None
     titulo: Optional[str] = None
     descricao: Optional[str] = None
@@ -102,23 +118,27 @@ class Trabalho:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Trabalho":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Nota:
+class Nota(RawMixin):
     tipo: Optional[str] = None
     nota: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Nota":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Disciplina:
+class Disciplina(RawMixin):
     id: Optional[int] = None
     nome: Optional[str] = None
     sigla: Optional[str] = None
@@ -136,12 +156,14 @@ class Disciplina:
     def from_dict(cls, data: dict[str, Any]) -> "Disciplina":
         notas = [Nota.from_dict(n) for n in data.get("notas", [])]
         medias = [Nota.from_dict(m) for m in data.get("medias", [])]
-        known = {f.name for f in dataclasses.fields(cls)} - {"notas", "medias"}
-        return cls(**{k: v for k, v in data.items() if k in known}, notas=notas, medias=medias)
+        known = {f.name for f in dataclasses.fields(cls)} - {"notas", "medias", "_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known}, notas=notas, medias=medias)
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class Mensagem:
+class Mensagem(RawMixin):
     id: Optional[int] = None
     assunto: Optional[str] = None
     remetente: Optional[str] = None
@@ -150,12 +172,14 @@ class Mensagem:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Mensagem":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class DadosAcademicos:
+class DadosAcademicos(RawMixin):
     ingresso: Optional[str] = None
     email_academico: Optional[str] = None
     email_escolar: Optional[str] = None
@@ -173,17 +197,21 @@ class DadosAcademicos:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "DadosAcademicos":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj
 
 
 @dataclasses.dataclass
-class RequisitosConclusao:
+class RequisitosConclusao(RawMixin):
     ch_total: Optional[int] = None
     ch_cumprida: Optional[int] = None
     pendencias: Optional[Any] = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "RequisitosConclusao":
-        known = {f.name for f in dataclasses.fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in known})
+        known = {f.name for f in dataclasses.fields(cls)} - {"_raw"}
+        obj = cls(**{k: v for k, v in data.items() if k in known})
+        obj._raw = data
+        return obj

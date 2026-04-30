@@ -98,6 +98,32 @@ O cliente organiza os endpoints em três recursos:
 
 ---
 
+## Acesso ao JSON original
+
+Todo objeto retornado pela biblioteca expõe um atributo `.raw` com o dicionário original recebido da API, antes de qualquer conversão ou limpeza de dados. Isso é útil para depuração, logging ou acesso a campos ainda não mapeados nos modelos.
+
+```python
+with SuapClient() as client:
+    dados = client.comum.get_my_data()
+
+    # JSON completo retornado pela API
+    print(dados.raw)
+
+    # Funciona em objetos aninhados também
+    print(dados.vinculo.raw)
+
+    disciplinas = client.edu.get_disciplines("2024.1")
+    print(disciplinas[0].raw)           # dict da disciplina
+    print(disciplinas[0].notas[0].raw)  # dict da nota
+```
+
+O atributo `.raw` nunca é `None` — retorna um `dict` vazio `{}` se o modelo for construído manualmente, fora do fluxo normal da API.
+
+!!! note
+    O `.raw` preserva todos os campos da resposta da API, inclusive os que não têm mapeamento no modelo. Campos de texto que o cliente normaliza para `None` (ex: `"NoneNone"`) aparecem com o valor original no `.raw`.
+
+---
+
 ## Exemplo completo
 
 ```python

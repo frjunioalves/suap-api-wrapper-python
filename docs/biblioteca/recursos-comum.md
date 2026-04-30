@@ -46,6 +46,14 @@ print(dados.email)        # "joao.silva@academico.ifpi.edu.br"
 | `naturalidade` | `str` |
 | `tipo_vinculo` | `str` |
 
+**Acesso ao JSON original:**
+
+```python
+dados = client.comum.get_my_data()
+print(dados.raw)          # dict completo da API
+print(dados.vinculo.raw)  # dict do sub-objeto vinculo
+```
+
 **Exceções:**
 
 | Exceção | Quando |

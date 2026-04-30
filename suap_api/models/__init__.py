@@ -1,3 +1,4 @@
+from .base import RawMixin
 from .comum import DadosPessoais, Vinculo
 from .edu import (
     Aula,
@@ -16,6 +17,7 @@ from .edu import (
 )
 
 __all__ = [
+    "RawMixin",
     "DadosPessoais",
     "Vinculo",
     "Periodo",
